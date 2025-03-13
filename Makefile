@@ -8,7 +8,6 @@ init: # Setup a poetry virtual environment for first time
 	poetry config virtualenvs.in-project true
 	poetry init
 	poetry shell
-	poery add numpy pandas matplotlib seaborn
 
 install: # Create a local Poetry virtual environment and install all required Python dependencies.
 	poetry env use 3.11
