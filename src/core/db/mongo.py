@@ -28,7 +28,7 @@ class MongoDatabaseConnector:
 
     def get_database(self):
         assert self._instance, "Database connection not initialized"
-
+     
         return self._instance[settings.MONGO_DATABASE_NAME]
 
     def close(self):
