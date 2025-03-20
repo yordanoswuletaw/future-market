@@ -26,10 +26,21 @@ class MongoDatabaseConnector:
 
         return cls._instance
 
-    def get_database(self):
+    def get_collection(self, name: str, expire_time: int = 31536000):
         assert self._instance, "Database connection not initialized"
      
-        return self._instance[settings.MONGO_DATABASE_NAME]
+        _database = self._instance[settings.MONGO_DATABASE_NAME]
+        
+        # Get the collection
+        _collection = _database[name]
+
+        # Unique index to prevent duplicate stock data
+        _collection.create_index([("symbol", 1), ("timestamp", 1)], unique=True)
+
+        # TTL index to automatically delete data older than 1 years
+        _collection.create_index("data_age", expireAfterSeconds=expire_time)
+        return _collection
+    
 
     def close(self):
         if self._instance:

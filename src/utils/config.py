@@ -18,7 +18,7 @@ class AppSettings(BaseSettings):
     DATA_TYPE: str = "json"  # Data type -> json | csv
     # for news sentiment
     NEWS_FUNCTION: str = "NEWS_SENTIMENT"
-    LIMIT: int = 50
+    LIMIT: int = 3
     TICKERS: str = 'IBM'
     # TIME_FROM: str = "20220410T0130"
     # TIME_TO: str = "20220410T0130"

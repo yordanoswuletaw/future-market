@@ -8,7 +8,7 @@ from utils.logger import get_logger
 from core.db.mongo import connection
 from utils.config import settings
 
-_database = connection.get_database("future_market")
+_collection = connection.get_collection('stock_data')
 
 logger = get_logger(__name__)
 
@@ -21,8 +21,9 @@ class StockData(BaseModel):
         if response.status_code == 200:
             data = response.json()
             last_refreshed = data['Meta Data']['3. Last Refreshed']
+            symbol = data['Meta Data']['2. Symbol']
 
-            return {'last_refreshed': last_refreshed, 'data': data.get(f"Time Series ({settings.INTERVAL})", {})}  # Adjust key based on API response
+            return {'symbol': symbol, 'last_refreshed': last_refreshed, 'data': data.get(f"Time Series ({settings.INTERVAL})", {})}  # Adjust key based on API response
         else:
             get_logger(f"Error fetching data: {response.status_code}")
             return None
@@ -38,9 +39,9 @@ class StockData(BaseModel):
         data = data['data']
 
         try:
-            collection = _database[cls._get_collection_name()]
-            for timestamp, record in data.items():
+            for symbol, timestamp, record in data.items():
                 stock_entry = {
+                    "symbol": symbol,
                     "timestamp": timestamp,
                     "batch": last_refreshed,
                     "open": float(record["1. open"]),
@@ -49,16 +50,12 @@ class StockData(BaseModel):
                     "close": float(record["4. close"]),
                     "volume": int(record["5. volume"])
                 }
-                collection.insert_one(stock_entry)
+                _collection.insert_one(stock_entry)
 
             logger.info("Data inserted successfully.")
 
         except:
             logger.exception("Failed to update or create document.")
             return None
-    
-    @classmethod
-    def _get_collection_name(cls) -> str:
-        return 'stock_data'
 
 StockData.insert_or_update()

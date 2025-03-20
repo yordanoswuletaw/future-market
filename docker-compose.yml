@@ -33,60 +33,30 @@ services:
       - "30003:30003"
     restart: always
 
-  # mq:
-  #   image: rabbitmq:3-management-alpine
-  #   container_name: llm-twin-mq
-  #   ports:
-  #     - "5673:5672"
-  #     - "15673:15672"
-  #   volumes:
-  #     - ./rabbitmq/data/:/var/lib/rabbitmq/
-  #     - ./rabbitmq/log/:/var/log/rabbitmq
-  #   restart: always
+  mq:
+    image: rabbitmq:4-management-alpine
+    container_name: future-market-mq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - ./rabbitmq/data/:/var/lib/rabbitmq/
+      - ./rabbitmq/log/:/var/log/rabbitmq
+    restart: always
 
-  # qdrant:
-  #   image: qdrant/qdrant:latest
-  #   container_name: llm-twin-qdrant
-  #   ports:
-  #     - "6333:6333"
-  #     - "6334:6334"
-  #   expose:
-  #     - "6333"
-  #     - "6334"
-  #     - "6335"
-  #   volumes:
-  #     - qdrant-data:/qdrant_data
-  #   restart: always
-
-  # data-crawlers:
-  #   image: "llm-twin-data-crawlers"
-  #   container_name: llm-twin-data-crawlers
-  #   platform: "linux/amd64"
-  #   build:
-  #     context: .
-  #     dockerfile: .docker/Dockerfile.data_crawlers
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "9010:8080"
-  #   depends_on:
-  #     - mongo1
-  #     - mongo2
-  #     - mongo3
-
-  # data_cdc:
-  #   image: "llm-twin-data-cdc"
-  #   container_name: llm-twin-data-cdc
-  #   build:
-  #     context: .
-  #     dockerfile: .docker/Dockerfile.data_cdc
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - mongo1
-  #     - mongo2
-  #     - mongo3
-  #     - mq
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: future-market-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    expose:
+      - "6333"
+      - "6334"
+      - "6335"
+    volumes:
+      - qdrant-data:/qdrant_data
+    restart: always
 
   # feature_pipeline:
   #   image: "llm-twin-feature-pipeline"
@@ -109,4 +79,4 @@ volumes:
   mongo-replica-1-data:
   mongo-replica-2-data:
   mongo-replica-3-data:
-  # qdrant-data:
+  qdrant-data:

@@ -1,17 +1,17 @@
 from typing import Optional
 import requests
 
-from datetime import datetime
+from datetime import datetime, timezone
 import pytz
 
-from pydantic import UUID4, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from utils.logger import get_logger
 
 from core.db.mongo import connection
 from utils.config import settings
 
-_database = connection.get_database("future_market")
+_collection = connection.get_collection('news_sentiment')
 
 logger = get_logger(__name__)
 
@@ -37,12 +37,13 @@ class NewsSentiment(BaseModel):
         if response.status_code == 200:
             data = response.json()
             return list(map(lambda news: {
+                "symbol": news['source'],
+                "timestamp": datetime.now(timezone.utc),
                 "title": news['title'],
                 "summary": news['summary'],
                 "timestamp": cls._convert_time_format(news['time_published']),
                 "overall_sentiment_score": news["overall_sentiment_score"],
                 "overall_sentiment_label": news["overall_sentiment_label"],
-                "content": news["url"],
                 "topics": news['topics'],
                 "ticker_sentiment": news["ticker_sentiment"]
             }, data['feed']))
@@ -57,34 +58,17 @@ class NewsSentiment(BaseModel):
         data = cls._fetch_live_news()
         if not data:
             logger.error("No data fetched from API.")
-        
-        print(data[:3])
-        
-    #     last_refreshed = data['last_refreshed']
-    #     data = data['data']
 
-    #     try:
-    #         collection = _database[cls._get_collection_name()]
-    #         for timestamp, record in data.items():
-    #             stock_entry = {
-    #                 "timestamp": timestamp,
-    #                 "batch": last_refreshed,
-    #                 "open": float(record["1. open"]),
-    #                 "high": float(record["2. high"]),
-    #                 "low": float(record["3. low"]),
-    #                 "close": float(record["4. close"]),
-    #                 "volume": int(record["5. volume"])
-    #             }
-    #             collection.insert_one(stock_entry)
+        try:
+            for stock_entry in data:
+                print(stock_entry)
+                print('---\n\n\n---')
+                _collection.insert_one(stock_entry)
 
-    #         logger.info("Data inserted successfully.")
+            logger.info("Data inserted successfully.")
 
-    #     except:
-    #         logger.exception("Failed to update or create document.")
-    #         return None
-    
-    @classmethod
-    def _get_collection_name(cls) -> str:
-        return 'news_sentiment'
+        except:
+            logger.exception("Failed to update or create document.")
+            return None
 
 NewsSentiment.insert_or_update()
