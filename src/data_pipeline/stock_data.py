@@ -8,7 +8,13 @@ from utils.logger import get_logger
 from core.db.mongo import connection
 from utils.config import settings
 
-_collection = connection.get_collection('stock_data')
+_database = connection.get_database('future_market')
+# Create a collection
+_collection = _database[settings.STOCK_COLLECTION_NAME]
+# Unique index to prevent duplicate stock data
+_collection.create_index([("symbol", 1), ("timestamp", 1)], unique=True)
+# TTL index to automatically delete data older than 1 years
+_collection.create_index("ttl", expireAfterSeconds=31536000)
 
 logger = get_logger(__name__)
 
@@ -36,10 +42,10 @@ class StockData(BaseModel):
             logger.error("No data fetched from API.")
         
         last_refreshed = data['last_refreshed']
-        data = data['data']
+        symbol = data['symbol']
 
         try:
-            for symbol, timestamp, record in data.items():
+            for timestamp, record in data['data'].items():
                 stock_entry = {
                     "symbol": symbol,
                     "timestamp": timestamp,

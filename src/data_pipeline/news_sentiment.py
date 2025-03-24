@@ -11,8 +11,13 @@ from utils.logger import get_logger
 from core.db.mongo import connection
 from utils.config import settings
 
-_collection = connection.get_collection('news_sentiment')
-
+_database = connection.get_database('future_market')
+# Create a collection
+_collection = _database[settings.NEWS_COLLECTION_NAME]
+# Unique index to prevent duplicate stock data
+_collection.create_index([("symbol", 1), ("timestamp", 1)], unique=True)
+# TTL index to automatically delete data older than 1 years
+_collection.create_index("ttl", expireAfterSeconds=31536000)
 logger = get_logger(__name__)
 
 class NewsSentiment(BaseModel):
@@ -61,8 +66,6 @@ class NewsSentiment(BaseModel):
 
         try:
             for stock_entry in data:
-                print(stock_entry)
-                print('---\n\n\n---')
                 _collection.insert_one(stock_entry)
 
             logger.info("Data inserted successfully.")
@@ -70,5 +73,3 @@ class NewsSentiment(BaseModel):
         except:
             logger.exception("Failed to update or create document.")
             return None
-
-NewsSentiment.insert_or_update()

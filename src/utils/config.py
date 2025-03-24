@@ -18,11 +18,10 @@ class AppSettings(BaseSettings):
     DATA_TYPE: str = "json"  # Data type -> json | csv
     # for news sentiment
     NEWS_FUNCTION: str = "NEWS_SENTIMENT"
-    LIMIT: int = 3
+    LIMIT: int = 50
     TICKERS: str = 'IBM'
     # TIME_FROM: str = "20220410T0130"
     # TIME_TO: str = "20220410T0130"
-    
     @property
     def URL(self) -> str:
         return f"https://www.alphavantage.co/query?function={self.FUNCTION}&symbol={self.SYMBOL}&interval={self.INTERVAL}&outputsize={self.OUTPUT_SIZE}&apikey={self.ALPHA_VANTAGE_API_KEY}&datatype={self.DATA_TYPE}"
@@ -32,11 +31,23 @@ class AppSettings(BaseSettings):
         return f"https://www.alphavantage.co/query?function={self.NEWS_FUNCTION}&tickers={self.TICKERS}&apikey={self.ALPHA_VANTAGE_API_KEY}&limit={self.LIMIT}"
 
 
+
     # MongoDB Configs
     MONGO_DATABASE_HOST: str = (
         "mongodb://mongo1:30001,mongo2:30002,mongo3:30003/?replicaSet=future-market-replica-set"
     )
     MONGO_DATABASE_NAME: str = "future_market"
+    STOCK_COLLECTION_NAME: str = "stock_data"
+    NEWS_COLLECTION_NAME: str = "news_sentiment"
+
+
+    # MQ config
+    RABBITMQ_DEFAULT_USERNAME: str = "guest"
+    RABBITMQ_DEFAULT_PASSWORD: str = "guest"
+    RABBITMQ_HOST: str = "localhost"
+    RABBITMQ_PORT: int = 5673
+    RABBITMQ_STOCK_QUEUE: str = "stock_data"
+    RABBITMQ_NEWS_QUEUE: str = "news_sentiment"
 
 
     # LLMS Configs
