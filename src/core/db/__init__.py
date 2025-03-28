@@ -1,3 +1,4 @@
 from .mongo import connection
+from .qdrant import QdrantDatabaseConnector
 
-__all__ = ["connection"]
+__all__ = ["connection", "QdrantDatabaseConnector"]

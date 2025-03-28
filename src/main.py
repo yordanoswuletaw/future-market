@@ -19,6 +19,5 @@ def main():
     # Listen to news sentiment changes and publish to a RabbitMQ queue
     publish_to_rabbitmq(settings.NEWS_COLLECTION_NAME, settings.RABBITMQ_NEWS_QUEUE) 
 
-
 if __name__ == "__main__":
     main()

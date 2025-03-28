@@ -49,9 +49,18 @@ class AppSettings(BaseSettings):
     RABBITMQ_STOCK_QUEUE: str = "stock_data"
     RABBITMQ_NEWS_QUEUE: str = "news_sentiment"
 
+    # QdrantDB config
+    QDRANT_DATABASE_HOST: str = "qdrant"
+    QDRANT_DATABASE_PORT: int = 6333
+    QDRANT_CLOUD_URL: str = "str"
+    QDRANT_APIKEY: str 
+    USE_QDRANT_CLOUD: bool = False
 
-    # LLMS Configs
-    GEMINI_MODEL_NAME: str = 'gemini-1.0-pro-001'
+    # Embedding Configs
+    EMBEDDING_MODEL_ID: str = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_MODEL_MAX_INPUT_LENGTH: int = 512
+    EMBEDDING_SIZE: int = 384
+    EMBEDDING_MODEL_DEVICE: str = "cpu"
 
 
     class Config:
