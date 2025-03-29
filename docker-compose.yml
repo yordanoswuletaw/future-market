@@ -58,22 +58,22 @@ services:
       - qdrant-data:/qdrant_data
     restart: always
 
-  # feature_pipeline:
-  #   image: "llm-twin-feature-pipeline"
-  #   container_name: llm-twin-feature-pipeline
-  #   build:
-  #     context: .
-  #     dockerfile: .docker/Dockerfile.feature_pipeline
-  #   environment:
-  #     BYTEWAX_PYTHON_FILE_PATH: "main:flow"
-  #     DEBUG: "false"
-  #     BYTEWAX_KEEP_CONTAINER_ALIVE: "true"
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - mq
-  #     - qdrant
-  #   restart: always
+  feature_pipeline:
+    image: "future-market-feature-pipeline"
+    container_name: future-market-feature-pipeline
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.feature_pipeline
+    environment:
+      BYTEWAX_PYTHON_FILE_PATH: "main:build_flow"
+      DEBUG: "false"
+      BYTEWAX_KEEP_CONTAINER_ALIVE: "true"
+    env_file:
+      - .env
+    depends_on:
+      - mq
+      - qdrant
+    restart: always
 
 volumes:
   mongo-replica-1-data:
