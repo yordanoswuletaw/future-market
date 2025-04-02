@@ -57,6 +57,36 @@ services:
     volumes:
       - qdrant-data:/qdrant_data
     restart: always
+  
+  data-pipeline:
+    image: "future-market-data-pipeline"
+    container_name: future-market-data-pipeline
+    platform: "linux/amd64"
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.data_pipeline
+    env_file:
+      - .env
+    ports:
+      - "9010:8080"
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+  
+  data_cdc:
+    image: "future-market-data-cdc"
+    container_name: future-market-data-cdc
+    build:
+      context: .
+      dockerfile: .docker/Dockerfile.data_cdc
+    env_file:
+      - .env
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+      - mq
 
   feature_pipeline:
     image: "future-market-feature-pipeline"

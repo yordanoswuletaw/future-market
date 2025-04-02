@@ -26,7 +26,7 @@ class QdrantDatabaseConnector:
                     port=settings.QDRANT_DATABASE_PORT,
                 )
     
-    def create_vector_collection(self, collection_name: str) -> None:
+    def create_vector_collection(self, collection_name: str = settings.VECTOR_COLLECTION_NAME) -> None:
         '''
         Create a vector collection in Qdrant
         '''
@@ -41,12 +41,12 @@ class QdrantDatabaseConnector:
         except Exception as e:
             logger.error(f"Error creating vector collection: {e}")
     
-    def create_non_vector_collection(self, collection_name: str) -> None:
+    def create_non_vector_collection(self, collection_name: str = settings.NON_VECTOR_COLLECTION_NAME) -> None:
         '''
         Create a non-vector collection in Qdrant
         '''
         try:
-            self._instance.create_collection(collection_name=collection_name)
+            self._instance.create_collection(collection_name=collection_name, vectors_config={})
         except Exception as e:
             logger.error(f"Error creating non-vector collection: {e}")
     

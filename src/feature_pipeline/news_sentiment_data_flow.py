@@ -2,8 +2,8 @@ import bytewax.operators as op
 from bytewax.dataflow import Dataflow
 from utils.config import settings
 from core.db.qdrant import QdrantDatabaseConnector
-from feature_pipeline.input_stream import RabbitMQSource
-# from data_flow.stream_output import QdrantOutput
+from input_stream import RabbitMQSource
+from output_stream import QdrantOutput
 # from data_logic.dispatchers import (
 #     ChunkingDispatcher,
 #     CleaningDispatcher,
@@ -33,17 +33,10 @@ def create_news_sentiment_data_flow():
     logger.info(f"Stream: {stream}")
 
     stream = op.map("clean dispatch", stream, clean_data)
-    # op.output(
-    #     "cleaned data insert to qdrant",
-    #     stream,
-    #     QdrantOutput(connection=connection, sink_type="clean"),
-    # )
-    # stream = op.flat_map("chunk dispatch", stream, ChunkingDispatcher.dispatch_chunker)
-    # stream = op.map(
-    #     "embedded chunk dispatch", stream, EmbeddingDispatcher.dispatch_embedder
-    # )
-    # op.output(
-    #     "embedded data insert to qdrant",
-    #     stream,
-    #     QdrantOutput(connection=connection, sink_type="vector"),
-    # )
+    op.output(
+        "cleaned data insert to qdrant",
+        stream,
+        QdrantOutput(connection=connection, sink_type="vector"),
+    )
+
+    return flow

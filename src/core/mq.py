@@ -77,46 +77,31 @@ class RabbitMQConnection:
             print("Closed RabbitMQ connection")
 
 
-
-# Get a database instance
-_database = connection.get_database('future_market')
-# Create an instance of RabbitMQConnection
-_rabbitmq_conn = RabbitMQConnection()
-
-def publish_to_rabbitmq(collection_name: str, queue_name: str):
-    """Listen to data changes and Publish data to a RabbitMQ queue."""
+def publish_to_rabbitmq(queue_name: str, data: str):
+    """Publish data to a RabbitMQ queue."""
     try:
-        # Get a collection
-        _collection = _database[collection_name]
+        # Create an instance of RabbitMQConnection
+        rabbitmq_conn = RabbitMQConnection()
 
         # Establish connection
-        with _rabbitmq_conn:
-            channel = _rabbitmq_conn.get_channel()
+        with rabbitmq_conn:
+            channel = rabbitmq_conn.get_channel()
 
             # Ensure the queue exists
             channel.queue_declare(queue=queue_name, durable=True)
 
             # Delivery confirmation
             channel.confirm_delivery()
-            
-            # Change Stream Listener
-            with _collection.watch() as stream:
-                for change in stream:   
 
-                    # Serialize change event
-                    message = str(change)
-
-                    # Send data to the queue
-                    channel.basic_publish(
-                        exchange="",
-                        routing_key=queue_name,
-                        body=message,
-                        properties=pika.BasicProperties(
-                            delivery_mode=2,  # make message persistent
-                        ),
-                    )
-                    logger.info(f"Published message to queue: {queue_name}")
-                    
+            # Send data to the queue
+            channel.basic_publish(
+                exchange="",
+                routing_key=queue_name,
+                body=data,
+                properties=pika.BasicProperties(
+                    delivery_mode=2,  # make message persistent
+                ),
+            )
     except pika.exceptions.UnroutableError:
         logger.warning("Message could not be routed")
     except Exception:

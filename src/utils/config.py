@@ -44,7 +44,7 @@ class AppSettings(BaseSettings):
     # MQ config
     RABBITMQ_DEFAULT_USERNAME: str = "guest"
     RABBITMQ_DEFAULT_PASSWORD: str = "guest"
-    RABBITMQ_HOST: str = "localhost"
+    RABBITMQ_HOST: str = "mq"
     RABBITMQ_PORT: int = 5673
     RABBITMQ_STOCK_QUEUE: str = "stock_data"
     RABBITMQ_NEWS_QUEUE: str = "news_sentiment"
@@ -61,6 +61,8 @@ class AppSettings(BaseSettings):
     EMBEDDING_MODEL_MAX_INPUT_LENGTH: int = 512
     EMBEDDING_SIZE: int = 384
     EMBEDDING_MODEL_DEVICE: str = "cpu"
+    VECTOR_COLLECTION_NAME: str = "news_sentiment"
+    NON_VECTOR_COLLECTION_NAME: str = "stock_data"
 
 
     class Config:
