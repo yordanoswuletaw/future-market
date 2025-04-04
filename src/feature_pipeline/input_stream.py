@@ -5,7 +5,7 @@ from typing import Generic, Iterable, List, Optional, TypeVar
 
 from bytewax.inputs import FixedPartitionedSource, StatefulSourcePartition
 from utils.logger import get_logger
-from core import RabbitMQConnection
+from core.mq import RabbitMQConnection
 
 logger = get_logger(__name__)
 
@@ -23,29 +23,34 @@ class RabbitMQPartition(StatefulSourcePartition, Generic[DataT, MessageT]):
         self._in_flight_msg_ids = resume_state or set()
         self.queue_name = queue_name
         self.connection = RabbitMQConnection()
-        self.connection.connect()
-        self.channel = self.connection.get_channel()
+        self.channel = None
+        self._ensure_connection()
+
+    def _ensure_connection(self):
+        if not self.connection.is_connected():
+            self.connection.connect()
+        if not self.channel or self.channel.is_closed:
+            self.channel = self.connection.get_channel()
+            self.channel.queue_declare(queue=self.queue_name, durable=True)
 
     def next_batch(self, sched: Optional[datetime]) -> Iterable[DataT]:
         try:
+            self._ensure_connection()
             method_frame, header_frame, body = self.channel.basic_get(
                 queue=self.queue_name, auto_ack=True
             )
-        except Exception:
+        except Exception as e:
             logger.error(
-                f"Error while fetching message from queue.", queue_name=self.queue_name
+                f"Error while fetching message from queue: {str(e)}", 
+                queue_name=self.queue_name
             )
             time.sleep(10)  # Sleep for 10 seconds before retrying to access the queue.
-
-            self.connection.connect()
-            self.channel = self.connection.get_channel()
-
+            self._ensure_connection()
             return []
 
         if method_frame:
             message_id = method_frame.delivery_tag
             self._in_flight_msg_ids.add(message_id)
-
             return [json.loads(body)]
         else:
             return []

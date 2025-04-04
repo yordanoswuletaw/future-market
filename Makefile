@@ -2,7 +2,7 @@ include .env
 
 $(eval export $(shell sed -ne 's/ *#.*$$//; /./ s/=.*$$// p' .env))
 
-PYTHONPATH := $(shell pwd)/src
+export PYTHONPATH := $(shell pwd)/src
 
 init: # Setup a poetry virtual environment for first time
 	poetry config virtualenvs.in-project true
@@ -25,6 +25,10 @@ local-start: # Build and start your local Docker infrastructure.
 
 local-stop: # Stop your local Docker infrastructure.
 	docker compose -f docker-compose.yml down --remove-orphans
+
+local-restart: # Restart your local Docker infrastructure.
+	docker compose -f docker-compose.yml down --remove-orphans
+	docker compose -f docker-compose.yml up --build -d
 
 
 # ======================================

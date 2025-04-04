@@ -45,7 +45,7 @@ class AppSettings(BaseSettings):
     RABBITMQ_DEFAULT_USERNAME: str = "guest"
     RABBITMQ_DEFAULT_PASSWORD: str = "guest"
     RABBITMQ_HOST: str = "mq"
-    RABBITMQ_PORT: int = 5673
+    RABBITMQ_PORT: int = 5672
     RABBITMQ_STOCK_QUEUE: str = "stock_data"
     RABBITMQ_NEWS_QUEUE: str = "news_sentiment"
 

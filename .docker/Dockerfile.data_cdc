@@ -40,4 +40,4 @@ COPY ./src/utils ./utils
 ENV PYTHONPATH=/app
 
 # Command to run the script
-CMD poetry run python /app/data_cdc/stock_data_cdc.py && poetry run python /app/data_cdc/news_sentiment_cdc.py && tail -f /dev/null
+CMD poetry run python /app/data_cdc/main.py && tail -f /dev/null

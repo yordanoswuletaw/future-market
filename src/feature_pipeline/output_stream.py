@@ -50,20 +50,21 @@ class QdrantCleanedDataSink(StatelessSinkPartition):
     def __init__(self, connection: QdrantDatabaseConnector):
         self._client = connection
 
-    def write_batch(self, items: list[VectorDBDataModel]) -> None:
-        payloads = [item.to_payload() for item in items]
-        ids, data = zip(*payloads)
-        collection_name = settings.NON_VECTOR_COLLECTION_NAME
-        self._client.write_data(
-            collection_name=collection_name,
-            points=Batch(ids=ids, vectors={}, payloads=data),
-        )
+    def write_batch(self, items: dict) -> None:
+        logger.info(f"Items: {items}")
+        # payloads = [item for item in items]
+        # ids, data = zip(*payloads)
+        # collection_name = settings.NON_VECTOR_COLLECTION_NAME
+        # self._client.write_data(
+        #     collection_name=collection_name,
+        #     points=Batch(ids=ids, vectors={}, payloads=data),
+        # )
 
-        logger.info(
-            "Successfully inserted requested cleaned point(s)",
-            collection_name=collection_name,
-            num=len(ids),
-        )
+        # logger.info(
+        #     "Successfully inserted requested cleaned point(s)",
+        #     collection_name=collection_name,
+        #     num=len(ids),
+        # )
 
 
 class QdrantVectorDataSink(StatelessSinkPartition):

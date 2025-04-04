@@ -2,6 +2,7 @@ from typing import Self
 
 import pika
 import json
+import time
 
 from utils.config import settings
 from utils.logger import get_logger
@@ -48,20 +49,33 @@ class RabbitMQConnection:
         self.close()
 
     def connect(self):
-        try:
-            credentials = pika.PlainCredentials(self.username, self.password)
-            self._connection = pika.BlockingConnection(
-                pika.ConnectionParameters(
-                    host=self.host,
-                    port=self.port,
-                    virtual_host=self.virtual_host,
-                    credentials=credentials,
+        max_retries = 3
+        retry_delay = 5  # seconds
+        
+        for attempt in range(max_retries):
+            try:
+                credentials = pika.PlainCredentials(self.username, self.password)
+                self._connection = pika.BlockingConnection(
+                    pika.ConnectionParameters(
+                        host=self.host,
+                        port=self.port,
+                        virtual_host=self.virtual_host,
+                        credentials=credentials,
+                        connection_attempts=max_retries,
+                        retry_delay=retry_delay,
+                        socket_timeout=5
+                    )
                 )
-            )
-        except pika.exceptions.AMQPConnectionError as e:
-            logger.exception("Failed to connect to RabbitMQ:")
-            if not self.fail_silently:
-                raise e
+                logger.info(f"Successfully connected to RabbitMQ at {self.host}:{self.port}")
+                return
+            except pika.exceptions.AMQPConnectionError as e:
+                logger.warning(f"Attempt {attempt + 1}/{max_retries} failed to connect to RabbitMQ: {str(e)}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                else:
+                    logger.exception("Failed to connect to RabbitMQ after all retries:")
+                    if not self.fail_silently:
+                        raise e
 
     def is_connected(self) -> bool:
         return self._connection is not None and self._connection.is_open
