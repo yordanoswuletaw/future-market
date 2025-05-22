@@ -43,14 +43,12 @@ class NewsSentiment(BaseModel):
             data = response.json()
             return list(map(lambda news: {
                 "symbol": news['source'],
-                "timestamp": datetime.now(timezone.utc),
+                "timestamp": cls._convert_time_format(news['time_published']),
                 "title": news['title'],
                 "summary": news['summary'],
-                "timestamp": cls._convert_time_format(news['time_published']),
                 "overall_sentiment_score": news["overall_sentiment_score"],
                 "overall_sentiment_label": news["overall_sentiment_label"],
                 "topics": news['topics'],
-                "ticker_sentiment": news["ticker_sentiment"]
             }, data['feed']))
 
         else:

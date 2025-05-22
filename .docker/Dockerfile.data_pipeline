@@ -48,7 +48,7 @@ COPY .env $WORKSPACE_ROOT/.env
 RUN touch /var/log/cron.log
 
 # Create and configure cron job to run every 60 minutes (change made here)
-RUN echo "0 * * * * root cd /usr/src/app && /usr/local/bin/python /usr/src/app/main.py >> /var/log/cron.log 2>&1" > /etc/cron.d/data-pipeline-cron && \
+RUN echo "*/3 * * * * root cd /usr/src/app && /usr/local/bin/python /usr/src/app/main.py >> /var/log/cron.log 2>&1" > /etc/cron.d/data-pipeline-cron && \
     chmod 0644 /etc/cron.d/data-pipeline-cron && \
     crontab /etc/cron.d/data-pipeline-cron
 

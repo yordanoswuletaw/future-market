@@ -18,7 +18,7 @@ class AppSettings(BaseSettings):
     DATA_TYPE: str = "json"  # Data type -> json | csv
     # for news sentiment
     NEWS_FUNCTION: str = "NEWS_SENTIMENT"
-    LIMIT: int = 50
+    LIMIT: int = 100
     TICKERS: str = 'IBM'
     # TIME_FROM: str = "20220410T0130"
     # TIME_TO: str = "20220410T0130"
@@ -44,6 +44,8 @@ class AppSettings(BaseSettings):
     # MQ config
     RABBITMQ_DEFAULT_USERNAME: str = "guest"
     RABBITMQ_DEFAULT_PASSWORD: str = "guest"
+    # RABBITMQ_HOST: str = "mq"
+    # RABBITMQ_PORT: int = 5672
     RABBITMQ_HOST: str = "mq"
     RABBITMQ_PORT: int = 5672
     RABBITMQ_STOCK_QUEUE: str = "stock_data"

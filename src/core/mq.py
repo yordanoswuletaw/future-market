@@ -118,8 +118,8 @@ def publish_to_rabbitmq(queue_name: str, data: str):
             )
     except pika.exceptions.UnroutableError:
         logger.warning("Message could not be routed")
-    except Exception:
-        logger.exception("Error publishing to RabbitMQ.")
+    except Exception as e:
+        logger.exception(f"Error publishing to RabbitMQ.{e}")
 
 
 if __name__ == "__main__":

@@ -42,4 +42,5 @@ local-fetch: # fetch stock data and sentiment news from Alpha Vantage API
 # ---------- Run Piplines -------------
 # ======================================
 local-run: # run piplines
-	cd src/ && poetry run python -m main
+	cd src/data_cdc && poetry run python -m main
+	cd src/feature_pipeline && poetry run python -m main
